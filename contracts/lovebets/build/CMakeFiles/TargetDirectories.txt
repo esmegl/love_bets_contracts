@@ -1,0 +1,3 @@
+/root/contracts/lovebets/build/CMakeFiles/rebuild_cache.dir
+/root/contracts/lovebets/build/CMakeFiles/lovebets.dir
+/root/contracts/lovebets/build/CMakeFiles/edit_cache.dir

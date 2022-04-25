@@ -1,0 +1,3 @@
+/root/contracts/eosio.token/build/CMakeFiles/rebuild_cache.dir
+/root/contracts/eosio.token/build/CMakeFiles/eosio.token.dir
+/root/contracts/eosio.token/build/CMakeFiles/edit_cache.dir
