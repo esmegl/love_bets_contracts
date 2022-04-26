@@ -1,43 +1,62 @@
 #!/usr/bin/env python3
 
-
-from pytest_eosio.telos import init_telos_token
-from pytest_eosio.sugar import collect_stdout
+from py_eosio.sugar import collect_stdout
 
 
-def test_initbet(eosio_testnet):
-    init_telos_token(eosio_testnet)
+def test_initbet(loveb):
+    cleos = loveb
 
-    eosio_testnet.create_account('eosio', 'a')
-    eosio_testnet.create_account('eosio', 'b')
-    eosio_testnet.create_account('eosio', 'm')
+    a = cleos.new_account()
+    b = cleos.new_account()
+    m = cleos.new_account()
 
-    ec, _ = eosio_testnet.give_token('a', '1000.0000 TLOS')
+    ec, _ = cleos.give_token(a, '1000.0000 TLOS')
     assert ec == 0
-    ec, _ = eosio_testnet.give_token('b', '1000.0000 TLOS')
+    ec, _ = cleos.give_token(b, '1000.0000 TLOS')
     assert ec == 0
 
-    bettors = [ 'a', 'b' ]
+    bettors = [ a, b ]
     witnesses = []  
     ministers = []
     loss = '0.9000 LOVE'
     btq = ['1.0000 TLOS', '1.0000 TLOS']
 
-    ec, out = eosio_testnet.push_action(
+    ec, out = cleos.push_action(
         'lovebets',
         'initbet',
-        ['m', bettors, witnesses, loss, btq],
-        'm@active'
+        [m, bettors, witnesses, loss, btq],
+        f'{m}@active'
     )
     assert ec == 0
 
-    memo_id = collect_stdout(out)
+    memo_id = int(collect_stdout(out))
 
-    ec, out = eosio_testnet.transfer_token(
-        'a', 'lovebets', '69.0000 TLOS', memo_id)
+    ec, out = cleos.transfer_token(
+        a, 'lovebets', '69.0000 TLOS', memo_id)
 
+    assert ec == 0
 
-    rows = eosio_testnet.get_table(
-        'lovebets', 'lovebets', 'wbets')
+    rows = [
+        row
+        for row in cleos.get_table(
+            'lovebets', 'lovebets', 'wbets')
+        if row['id'] == memo_id
+    ]
 
-    breakpoint()
+    assert len(rows) == 1
+    assert a not in rows[0]['bettors']
+
+    ec, out = cleos.transfer_token(
+        b, 'lovebets', '69.0000 TLOS', memo_id)
+
+    rows = [
+        row
+        for row in cleos.get_table(
+            'lovebets', 'lovebets', 'wbets')
+        if row['id'] == memo_id
+    ]
+
+    assert ec ==0
+    assert b not in rows[0]['bettors']
+
+    

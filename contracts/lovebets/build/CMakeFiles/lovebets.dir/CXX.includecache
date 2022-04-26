@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/root/target/lovebets.cpp
+lovebets.hpp
+/root/target/lovebets.hpp
+
+/root/target/lovebets.hpp
+vector
+-
+string
+-
+eosio/eosio.hpp
+-
+eosio/asset.hpp
+-
+

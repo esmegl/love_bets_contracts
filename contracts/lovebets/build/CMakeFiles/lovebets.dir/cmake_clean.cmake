@@ -1,6 +1,5 @@
 file(REMOVE_RECURSE
   "CMakeFiles/lovebets.dir/lovebets.cpp.o"
-  "CMakeFiles/lovebets.dir/lovebets.cpp.o.d"
   "lovebets.pdb"
   "lovebets.wasm"
 )

@@ -1,0 +1,36 @@
+FROM ubuntu:18.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y \
+        git \
+        wget \ 
+        make \
+        cmake
+
+
+WORKDIR /root
+
+RUN git clone https://github.com/EOSIO/eos.git
+WORKDIR /root/eos
+
+RUN git checkout tags/v1.8.14 && git submodule update --init --recursive
+
+RUN sed -i 's/dl.bintray.com\/boostorg/boostorg.jfrog.io\/artifactory\/main/g' scripts/helpers/eosio.sh
+
+RUN bash ./scripts/eosio_build.sh -y
+
+RUN bash ./scripts/eosio_install.sh -y
+
+RUN wget https://github.com/EOSIO/eosio.cdt/releases/download/v1.7.0/eosio.cdt_1.7.0-1-ubuntu-18.04_amd64.deb && \
+    apt-get install -y ./eosio.cdt_1.7.0-1-ubuntu-18.04_amd64.deb
+
+RUN mkdir -p /root/target
+
+RUN mkdir -p /root/target
+
+WORKDIR /root/target
+
+ENV eosio_DIR /root/eosio/1.8/lib/cmake/eosio
+ENV BOOST_ROOT /root/eosio/1.8/src/boost_1_70_0

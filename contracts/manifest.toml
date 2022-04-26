@@ -1,7 +1,0 @@
-[lovebets]
-cdt = '1.7.0'
-
-[eosiotoken]
-cdt = '1.7.0'
-name = 'eosio.token'
-dir = 'eosio.token'
