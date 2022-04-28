@@ -9,13 +9,14 @@ using std::vector;
 using std::string;
 using std::find;
 
-
-static constexpr symbol TLOS_SYM = symbol("TLOS", 4);
-static constexpr asset MIN_BET(30.0000, TLOS_SYM);
+#include "utils.hpp"
 
 class [[eosio::contract]] lovebets : public contract {
    public:
       using contract::contract;
+
+      static constexpr symbol TLOS_SYM = symbol("TLOS", 4);
+      static constexpr uint32_t MIN_BET = 300000;
 
       [[eosio::action]]
       void initbet( 
@@ -23,9 +24,16 @@ class [[eosio::contract]] lovebets : public contract {
          vector<name> bettors,
          vector<name> witnesses,
          asset loss,
-         vector<asset> bettor_quantity
+         vector<asset> bettor_quantity,
+         name ram_payer
       );
       //using initbet_action = action_wrapper<"wbets"_n, &lovebets::initbet>;
+
+      [[eosio::action]]
+      void endbet(name bettor, uint64_t bet_id);
+
+      [[eosio::on_notify("eosio.token::transfer")]]
+      void bet_handler(name from, name to, asset quantity, string memo);
 
 
       // Bet not already validated on the blockchain
@@ -35,6 +43,8 @@ class [[eosio::contract]] lovebets : public contract {
          uint64_t id;
          // People that are going to participate in the bet
          vector<name> bettors;
+         // Unpaid bettors
+         vector<name> unpaid;
          // Witnesses of the bet
          vector<name> witnesses;
          // Minister
@@ -46,14 +56,9 @@ class [[eosio::contract]] lovebets : public contract {
          uint64_t primary_key() const {return id;}
       };
 
-      typedef eosio::multi_index<"wbets"_n, wannabe_bets_s> wannabe_bets_t;
-
-      [[eosio::on_notify("eosio.token::transfer")]]
-      void bet_handler(name from, name to, asset quantity, string memo);
-
 
       //Bet in progress already validated on the blockchain
-      struct [[eosio::table]] bets_in_progress
+      struct [[eosio::table]] bets_in_progress_s
       {
          // Table's id
          uint64_t id;
@@ -70,22 +75,7 @@ class [[eosio::contract]] lovebets : public contract {
          uint64_t primary_key() const {return id;}
       };   
 
+      typedef eosio::multi_index<"wbets"_n, wannabe_bets_s> wannabe_bets_t;
+      typedef eosio::multi_index<"pbets"_n, bets_in_progress_s> bets_in_progress_t;
 
-      //Bets that were finalized (divorce)
-      struct [[eosio::table]] finalized_bets
-      {
-         // Table's id
-         uint64_t id;
-         // Divorced bettors
-         vector<name> bettors;
-         // Witnesses of the bet
-         vector<name> witnesses;
-         // Minister
-         name minister;
-         // Ammount of money bettors lost
-         asset loss;
-         // Amount of money each bettor bet
-         vector<asset> bettor_quantity;
-         uint64_t primary_key() const {return id;}
-      },
 };
