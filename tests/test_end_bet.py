@@ -3,13 +3,14 @@
 from py_eosio.sugar import collect_stdout, Name
 import json
 
+
 def test_initbet(loveb):
     cleos = loveb
 
     a = cleos.new_account()
     b = cleos.new_account()
     m = cleos.new_account()
-    bet_name = 'asdfghjkloiu'
+    bet_name = 'widtbadoemid'
     bet_name_n = Name(bet_name)
 
     ec, _ = cleos.give_token(a, '1000.0000 TLOS')
@@ -33,7 +34,7 @@ def test_initbet(loveb):
                 'bettors': (a, b),
                 'witnesses': (),
                 'loss': '0.9000 LOSS',
-                'bettor_quantity': ('13.0000 TLOS', '40.0000 TLOS')
+                'bettor_quantity': ('69.0000 TLOS', '30.0000 TLOS')
             }
         )
 
@@ -44,7 +45,6 @@ def test_initbet(loveb):
             [f'{name}@active'],
             name
         )
-    
         assert ec == 0        
 
     ec, out = cleos.multi_sig_exec(
@@ -55,7 +55,35 @@ def test_initbet(loveb):
     assert ec == 0 
 
     ec, out = cleos.transfer_token(
-        a, 'lovebets', '13.0000 TLOS', bet_name, retry=0)
+        a, 'lovebets', '69.0000 TLOS', bet_name)
+    assert ec == 0
 
-    assert ec == 1
-    assert 'Minimum quantity required is 30.0000 TLOS.' in out
+    cleos.logger.critical(f'First transfer out is: {json.dumps(out, indent=4)}')
+
+
+    ec, out = cleos.transfer_token(
+        b, 'lovebets', '30.0000 TLOS', bet_name)
+    assert ec == 0
+
+    cleos.logger.critical(f'Second transfer out is: {json.dumps(out, indent=4)}')
+    
+    rows = [
+            row
+            for row in cleos.get_table(
+                'lovebets', 'lovebets', 'pbets')
+            if row['id'] == str(bet_name_n.value)
+    ]
+
+    assert len(rows) == 1
+    assert a, b in rows[0]['bettors'] 
+
+    ec, out = cleos.push_action(
+        'lovebets',
+        'endbet',
+        [a, bet_name],
+        f'{a}@active'
+    )    
+    
+    assert ec == 0
+
+

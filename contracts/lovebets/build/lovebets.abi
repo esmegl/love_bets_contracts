@@ -4,9 +4,57 @@
     "types": [],
     "structs": [
         {
+            "name": "bets_in_progress_s",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "bettors",
+                    "type": "name[]"
+                },
+                {
+                    "name": "witnesses",
+                    "type": "name[]"
+                },
+                {
+                    "name": "minister",
+                    "type": "name"
+                },
+                {
+                    "name": "loss",
+                    "type": "asset"
+                },
+                {
+                    "name": "bettor_quantity",
+                    "type": "asset[]"
+                }
+            ]
+        },
+        {
+            "name": "endbet",
+            "base": "",
+            "fields": [
+                {
+                    "name": "bettor",
+                    "type": "name"
+                },
+                {
+                    "name": "bet_name",
+                    "type": "string"
+                }
+            ]
+        },
+        {
             "name": "initbet",
             "base": "",
             "fields": [
+                {
+                    "name": "bet_name",
+                    "type": "name"
+                },
                 {
                     "name": "minister",
                     "type": "name"
@@ -42,6 +90,10 @@
                     "type": "name[]"
                 },
                 {
+                    "name": "unpaid",
+                    "type": "name[]"
+                },
+                {
                     "name": "witnesses",
                     "type": "name[]"
                 },
@@ -56,11 +108,20 @@
                 {
                     "name": "bettor_quantity",
                     "type": "asset[]"
+                },
+                {
+                    "name": "ram_payer",
+                    "type": "name"
                 }
             ]
         }
     ],
     "actions": [
+        {
+            "name": "endbet",
+            "type": "endbet",
+            "ricardian_contract": ""
+        },
         {
             "name": "initbet",
             "type": "initbet",
@@ -68,6 +129,13 @@
         }
     ],
     "tables": [
+        {
+            "name": "pbets",
+            "type": "bets_in_progress_s",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
         {
             "name": "wbets",
             "type": "wannabe_bets_s",

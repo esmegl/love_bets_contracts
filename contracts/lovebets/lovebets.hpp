@@ -16,24 +16,31 @@ class [[eosio::contract]] lovebets : public contract {
       using contract::contract;
 
       static constexpr symbol TLOS_SYM = symbol("TLOS", 4);
+      static constexpr symbol LOSS_SYM = symbol("LOSS", 4);
       static constexpr uint32_t MIN_BET = 300000;
+      static constexpr uint32_t MIN_LOSS = 1000;
+      static constexpr uint32_t MAX_LOSS = 10000;
 
       [[eosio::action]]
       void initbet( 
+         name bet_name,
          name minister,
          vector<name> bettors,
          vector<name> witnesses,
          asset loss,
-         vector<asset> bettor_quantity,
-         name ram_payer
+         vector<asset> bettor_quantity
       );
-      //using initbet_action = action_wrapper<"wbets"_n, &lovebets::initbet>;
 
       [[eosio::action]]
-      void endbet(name bettor, uint64_t bet_id);
+      void endbet(name bettor, string bet_name);
 
       [[eosio::on_notify("eosio.token::transfer")]]
-      void bet_handler(name from, name to, asset quantity, string memo);
+      void bet_handler(
+         name from, 
+         name to, 
+         asset quantity, 
+         string bet_name
+      );
 
 
       // Bet not already validated on the blockchain
@@ -53,6 +60,7 @@ class [[eosio::contract]] lovebets : public contract {
          asset loss;
          // Amount of money each bettor is going to bet
          vector<asset> bettor_quantity;
+         name ram_payer;
          uint64_t primary_key() const {return id;}
       };
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from py_eosio.sugar import collect_stdout
+from py_eosio.sugar import collect_stdout, Name
+import json
 
 
 def test_initbet(loveb):
@@ -9,54 +10,95 @@ def test_initbet(loveb):
     a = cleos.new_account()
     b = cleos.new_account()
     m = cleos.new_account()
+    bet_name = 'asdfghjkloiu'
+    bet_name_n = Name(bet_name)
 
     ec, _ = cleos.give_token(a, '1000.0000 TLOS')
     assert ec == 0
     ec, _ = cleos.give_token(b, '1000.0000 TLOS')
     assert ec == 0
 
-    bettors = [ a, b ]
-    witnesses = []  
-    ministers = []
-    loss = '0.9000 LOVE'
-    btq = ['1.0000 TLOS', '1.0000 TLOS']
+    # Multi signature
+    owner_perms = [f'{name}@active' for name in (m, b)]
+    owner_perms.sort()
 
-    ec, out = cleos.push_action(
-        'lovebets',
-        'initbet',
-        [m, bettors, witnesses, loss, btq],
-        f'{m}@active'
-    )
-    assert ec == 0
+    proposal = cleos.multi_sig_propose(
+            m,
+            owner_perms,
+            owner_perms,
+            'lovebets',
+            'initbet',
+            {
+                'bet_name': bet_name,
+                'minister': m,
+                'bettors': (a, b),
+                'witnesses': (),
+                'loss': '0.9000 LOSS',
+                'bettor_quantity': ('69.0000 TLOS', '30.0000 TLOS')
+            }
+        )
 
-    memo_id = int(collect_stdout(out))
+    for name in (m, b):
+        ec, _ = cleos.multi_sig_approve(
+            m,
+            proposal,
+            [f'{name}@active'],
+            name
+        )
+    
+        assert ec == 0        
 
-    ec, out = cleos.transfer_token(
-        a, 'lovebets', '69.0000 TLOS', memo_id)
-
-    assert ec == 0
+    ec, out = cleos.multi_sig_exec(
+            m,
+            proposal,
+            f'{m}@active'
+        )
+    assert ec == 0 
 
     rows = [
         row
         for row in cleos.get_table(
             'lovebets', 'lovebets', 'wbets')
-        if row['id'] == memo_id
+        if row['id'] == str(bet_name_n.value)
     ]
+
+    assert a, b in rows[0]['unpaid']
+
+    ec, out = cleos.transfer_token(
+        a, 'lovebets', '69.0000 TLOS', bet_name)
+
+    assert ec == 0
+
+    cleos.logger.critical(cleos.get_table(
+            'lovebets', 'lovebets', 'wbets'))
+
+    rows = [
+        row
+        for row in cleos.get_table(
+            'lovebets', 'lovebets', 'wbets')
+        if row['id'] == str(bet_name_n.value)
+    ]
+
+    # cleos.logger.critical(f'Bet name value is: {bet_name_n.value}')
 
     assert len(rows) == 1
-    assert a not in rows[0]['bettors']
+    assert a not in rows[0]['unpaid']
 
     ec, out = cleos.transfer_token(
-        b, 'lovebets', '69.0000 TLOS', memo_id)
+        b, 'lovebets', '30.0000 TLOS', bet_name)
+
+    assert ec == 0
+
+    cleos.logger.critical(f'Second transfer out is: {json.dumps(out, indent=4)}')
 
     rows = [
         row
         for row in cleos.get_table(
             'lovebets', 'lovebets', 'wbets')
-        if row['id'] == memo_id
+        if row['id'] == str(bet_name_n.value)
     ]
 
-    assert ec ==0
-    assert b not in rows[0]['bettors']
+    assert len(rows) == 0
+
 
     

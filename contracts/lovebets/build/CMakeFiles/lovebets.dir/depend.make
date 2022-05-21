@@ -3,4 +3,5 @@
 
 CMakeFiles/lovebets.dir/lovebets.cpp.o: ../lovebets.cpp
 CMakeFiles/lovebets.dir/lovebets.cpp.o: ../lovebets.hpp
+CMakeFiles/lovebets.dir/lovebets.cpp.o: ../utils.hpp
 
