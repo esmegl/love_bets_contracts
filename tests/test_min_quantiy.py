@@ -9,15 +9,17 @@ def test_initbet(loveb):
     a = cleos.new_account()
     b = cleos.new_account()
     m = cleos.new_account()
-    bet_name = 'asdfghjkloiu'
-    bet_name_n = Name(bet_name)
+    bet_name = 'asdfghjklouw'
 
     ec, _ = cleos.give_token(a, '1000.0000 TLOS')
     assert ec == 0
     ec, _ = cleos.give_token(b, '1000.0000 TLOS')
     assert ec == 0
 
-    # Multi signature
+    bettor_quantity_a = '13.0000 TLOS'
+    bettor_quantity_b = '40.0000 TLOS'
+
+    # Check min quantity
     owner_perms = [f'{name}@active' for name in (m, b)]
     owner_perms.sort()
 
@@ -33,7 +35,7 @@ def test_initbet(loveb):
                 'bettors': (a, b),
                 'witnesses': (),
                 'loss': '0.9000 LOSS',
-                'bettor_quantity': ('13.0000 TLOS', '40.0000 TLOS')
+                'bettor_quantity': (bettor_quantity_a, bettor_quantity_b)
             }
         )
 
@@ -55,7 +57,7 @@ def test_initbet(loveb):
     assert ec == 0 
 
     ec, out = cleos.transfer_token(
-        a, 'lovebets', '13.0000 TLOS', bet_name, retry=0)
+        a, 'lovebets', bettor_quantity_a, bet_name, retry=0)
 
     assert ec == 1
     assert 'Minimum quantity required is 30.0000 TLOS.' in out

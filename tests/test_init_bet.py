@@ -10,13 +10,16 @@ def test_initbet(loveb):
     a = cleos.new_account()
     b = cleos.new_account()
     m = cleos.new_account()
-    bet_name = 'asdfghjkloiu'
+    bet_name = 'asdfghjklous'
     bet_name_n = Name(bet_name)
 
     ec, _ = cleos.give_token(a, '1000.0000 TLOS')
     assert ec == 0
     ec, _ = cleos.give_token(b, '1000.0000 TLOS')
     assert ec == 0
+
+    bettor_quantity_a = '69.0000 TLOS'
+    bettor_quantity_b = '30.0000 TLOS'
 
     # Multi signature
     owner_perms = [f'{name}@active' for name in (m, b)]
@@ -34,7 +37,7 @@ def test_initbet(loveb):
                 'bettors': (a, b),
                 'witnesses': (),
                 'loss': '0.9000 LOSS',
-                'bettor_quantity': ('69.0000 TLOS', '30.0000 TLOS')
+                'bettor_quantity': (bettor_quantity_a, bettor_quantity_b)
             }
         )
 
@@ -65,12 +68,9 @@ def test_initbet(loveb):
     assert a, b in rows[0]['unpaid']
 
     ec, out = cleos.transfer_token(
-        a, 'lovebets', '69.0000 TLOS', bet_name)
+        a, 'lovebets', bettor_quantity_a, bet_name)
 
     assert ec == 0
-
-    cleos.logger.critical(cleos.get_table(
-            'lovebets', 'lovebets', 'wbets'))
 
     rows = [
         row
@@ -79,18 +79,15 @@ def test_initbet(loveb):
         if row['id'] == str(bet_name_n.value)
     ]
 
-    # cleos.logger.critical(f'Bet name value is: {bet_name_n.value}')
-
     assert len(rows) == 1
     assert a not in rows[0]['unpaid']
 
     ec, out = cleos.transfer_token(
-        b, 'lovebets', '30.0000 TLOS', bet_name)
+        b, 'lovebets', bettor_quantity_b, bet_name)
 
     assert ec == 0
 
-    cleos.logger.critical(f'Second transfer out is: {json.dumps(out, indent=4)}')
-
+    # Check the table was deleted on wbets
     rows = [
         row
         for row in cleos.get_table(
@@ -99,6 +96,16 @@ def test_initbet(loveb):
     ]
 
     assert len(rows) == 0
+
+    # Check the table was created on pbets
+    rows = [
+        row
+        for row in cleos.get_table(
+            'lovebets', 'lovebets', 'pbets')
+        if row['id'] == str(bet_name_n.value)
+    ]
+
+    assert len(rows) == 1
 
 
     

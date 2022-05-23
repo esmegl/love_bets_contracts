@@ -32,6 +32,9 @@ class [[eosio::contract]] lovebets : public contract {
       );
 
       [[eosio::action]]
+      void cancelbet(name bettor, string bet_name);
+
+      [[eosio::action]]
       void endbet(name bettor, string bet_name);
 
       [[eosio::on_notify("eosio.token::transfer")]]

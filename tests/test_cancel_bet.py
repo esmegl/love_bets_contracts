@@ -3,14 +3,13 @@
 from py_eosio.sugar import collect_stdout, Name
 import json
 
-
-def test_initbet(loveb):
+def test_irefund(loveb):
     cleos = loveb
 
     a = cleos.new_account()
     b = cleos.new_account()
     m = cleos.new_account()
-    bet_name = 'dwidtbadoemd'
+    bet_name = 'qrmsotvpm1sd'
     bet_name_n = Name(bet_name)
 
     ec, _ = cleos.give_token(a, '1000.0000 TLOS')
@@ -18,10 +17,10 @@ def test_initbet(loveb):
     ec, _ = cleos.give_token(b, '1000.0000 TLOS')
     assert ec == 0
 
-    bettor_quantity_a = '69.0000 TLOS'
-    bettor_quantity_b = '30.0000 TLOS'
+    bettor_quantity_a = '46.0000 TLOS'
+    bettor_quantity_b = '78.0000 TLOS'
 
-    # Multi signature
+    # Init bet
     owner_perms = [f'{name}@active' for name in (m, b)]
     owner_perms.sort()
 
@@ -36,7 +35,7 @@ def test_initbet(loveb):
                 'minister': m,
                 'bettors': (a, b),
                 'witnesses': (),
-                'loss': '0.9000 LOSS',
+                'loss': '0.5000 LOSS',
                 'bettor_quantity': (bettor_quantity_a, bettor_quantity_b)
             }
         )
@@ -48,6 +47,7 @@ def test_initbet(loveb):
             [f'{name}@active'],
             name
         )
+    
         assert ec == 0        
 
     ec, out = cleos.multi_sig_exec(
@@ -57,45 +57,33 @@ def test_initbet(loveb):
         )
     assert ec == 0 
 
-    ec, out = cleos.transfer_token(
-        a, 'lovebets', bettor_quantity_a, bet_name)
-    assert ec == 0
 
-    ec, out = cleos.transfer_token(
-        b, 'lovebets', bettor_quantity_b, bet_name)
-    assert ec == 0
-    
     rows = [
-            row
-            for row in cleos.get_table(
-                'lovebets', 'lovebets', 'pbets')
-            if row['id'] == str(bet_name_n.value)
+        row
+        for row in cleos.get_table(
+            'lovebets', 'lovebets', 'wbets')
+        if row['id'] == str(bet_name_n.value)
     ]
 
     assert len(rows) == 1
-    assert a, b in rows[0]['bettors'] 
 
-
-    # Call endbet function
+    # Call cancelbet function
     ec, out = cleos.push_action(
         'lovebets',
-        'endbet',
-        [a, bet_name],
-        f'{a}@active'
+        'cancelbet',
+        [b, bet_name],
+        f'{b}@active'
     )    
     
     assert ec == 0
 
-    # Check the table was deleted from pbets
+    # Check the table was deleted from wbets
     rows = [
             row
             for row in cleos.get_table(
-                'lovebets', 'lovebets', 'pbets')
+                'lovebets', 'lovebets', 'wbets')
             if row['id'] == str(bet_name_n.value)
     ]
 
     assert len(rows) == 0
-
-
-
 

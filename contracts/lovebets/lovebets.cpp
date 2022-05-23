@@ -9,13 +9,13 @@ void lovebets::initbet(
    asset loss,
    vector<asset> bettor_quantity) {
 
-   // Authenticates the minister
    require_auth(minister);
 
    wannabe_bets_t wbets(get_self(), get_self().value);
 
    //Check if bet name is not taken already
-   check(wbets.find(bet_name.value) == wbets.end(), "Bet name already taken, please choose another name. \n");
+   check(wbets.find(bet_name.value) == wbets.end(), 
+      "Bet name already taken, please choose another name. \n");
 
    // The ram payer is the last bettor to enter the bet
    name ram_payer = bettors[bettors.size() - 1];
@@ -47,13 +47,28 @@ void lovebets::initbet(
    });
 }
 
+// Cancel bet initialization
+void lovebets::cancelbet(name bettor, string bet_name) {
+
+   require_auth(bettor);
+
+   wannabe_bets_t wbets(get_self(), get_self().value);
+
+   name n = name(bet_name);
+   auto cancel_it = wbets.find(n.value);
+   check(cancel_it != wbets.end(), "Bet not found.\n");
+
+   wbets.erase(cancel_it);
+   print("Bet cancelled. \n");
+}
+
 void lovebets::bet_handler(
    name from,
    name to,
    asset quantity,
    string bet_name) {
 
-   // If the transacction was from me or is not for me, do nothing.
+   // If the transacction was from lovebets or is not for lovebets, do nothing.
    if (to != get_self() || from == get_self()) return;
 
    //TODO:
@@ -67,9 +82,11 @@ void lovebets::bet_handler(
    // Convert string id to uint
    name n = name(bet_name);
    auto bet_it = wbets.find(n.value);
+
    auto ram_payer = bet_it->ram_payer;
 
    asset loss = bet_it->loss;
+   check(loss.symbol == LOSS_SYM, "Symbol has to be LOSS.\n");
    check(loss.amount >= MIN_LOSS, "Minimum loss required is 0.1000 LOSS.\n");
    check(loss.amount <= MAX_LOSS, "Maximum loss allowed is 1 LOSS.\n");
 
@@ -81,6 +98,10 @@ void lovebets::bet_handler(
 
    // Check if the bettor is in the database, if it's not print "Bettor not found."
    check(bettor_it != bet_it->bettors.end(), "Bettor not found.\n");
+
+   int i = bettor_it - bet_it->bettors.begin();
+   check(quantity == bet_it->bettor_quantity[i], 
+      "The amount of TLOS is incorrect, please transfer the amount stated in the initialization of the bet. \n");
 
    // Unpaid iterator
    auto unpaid_it = find(bet_it->unpaid.begin(), bet_it->unpaid.end(), from);
@@ -116,6 +137,7 @@ void lovebets::bet_handler(
    }
 }
 
+// End initialized bet
 void lovebets::endbet (name bettor, string bet_name) {
 
    require_auth(bettor);

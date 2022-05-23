@@ -34,6 +34,20 @@
             ]
         },
         {
+            "name": "cancelbet",
+            "base": "",
+            "fields": [
+                {
+                    "name": "bettor",
+                    "type": "name"
+                },
+                {
+                    "name": "bet_name",
+                    "type": "string"
+                }
+            ]
+        },
+        {
             "name": "endbet",
             "base": "",
             "fields": [
@@ -117,6 +131,11 @@
         }
     ],
     "actions": [
+        {
+            "name": "cancelbet",
+            "type": "cancelbet",
+            "ricardian_contract": ""
+        },
         {
             "name": "endbet",
             "type": "endbet",

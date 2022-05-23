@@ -9,11 +9,3 @@ To build contract or recompile (from 'REPO_ROOT/contracts/'):
 
  To run tests(from repo root):
  - sudo pytest tests/[testname]
-
-
- To activate environment(from root file):
- -source env/bin/activate
-
-
- To deactivate environment(from root file):
- - deactivate
