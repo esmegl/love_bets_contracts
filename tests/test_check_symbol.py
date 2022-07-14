@@ -3,7 +3,7 @@
 from py_eosio.sugar import collect_stdout, Name
 import json
 
-def test_initbet(loveb):
+def test_check_symbol(loveb):
     cleos = loveb
 
     a = cleos.new_account()
@@ -58,11 +58,11 @@ def test_initbet(loveb):
 
     ec, out = cleos.transfer_token(
         a, 'lovebets', bettor_quantity_tlos, bet_name_tlos, retry=0)
-
+    cleos.logger.critical(f'Out is: {out}')
     assert ec == 1
     assert 'Symbol has to be TLOS.' in out
 
-    cleos.logger.critical(f'Out is: {out}')
+    # cleos.logger.critical(f'Out is: {out}')
 
     # Check LOSS symbol
     # owner_perms = [f'{name}@active' for name in (m, b)]

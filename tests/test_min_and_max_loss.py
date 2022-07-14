@@ -3,7 +3,7 @@
 from py_eosio.sugar import collect_stdout
 import json
 
-def test_initbet(loveb):
+def test_min_and_max_loss(loveb):
     cleos = loveb
 
     a = cleos.new_account()

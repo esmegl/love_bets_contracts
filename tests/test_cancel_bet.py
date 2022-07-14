@@ -3,7 +3,7 @@
 from py_eosio.sugar import collect_stdout, Name
 import json
 
-def test_irefund(loveb):
+def test_icancel_bet(loveb):
     cleos = loveb
 
     a = cleos.new_account()
@@ -56,7 +56,6 @@ def test_irefund(loveb):
             f'{m}@active'
         )
     assert ec == 0 
-
 
     rows = [
         row

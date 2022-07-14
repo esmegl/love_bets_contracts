@@ -4,7 +4,7 @@ from py_eosio.sugar import collect_stdout, Name
 import json
 
 
-def test_initbet(loveb):
+def test_init_bet(loveb):
     cleos = loveb
 
     a = cleos.new_account()
