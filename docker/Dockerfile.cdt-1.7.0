@@ -34,3 +34,7 @@ WORKDIR /root/target
 
 ENV eosio_DIR /root/eosio/1.8/lib/cmake/eosio
 ENV BOOST_ROOT /root/eosio/1.8/src/boost_1_70_0
+
+COPY contracts /root/contracts
+
+ENV PATH /root/eosio/1.8/bin:$PATH
