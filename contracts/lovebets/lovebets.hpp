@@ -1,6 +1,11 @@
 #include <vector>
 #include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <eosio/time.hpp>
+#include <eosio/crypto.hpp>
 
+#include <eosio/system.hpp>
 #include <eosio/eosio.hpp>
 #include <eosio/asset.hpp>
 using namespace eosio;

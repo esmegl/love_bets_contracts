@@ -1,5 +1,25 @@
 #include "lovebets.hpp"
 
+// Aux functions
+//  static uint32_t prng_range(uint64_t nonce, uint32_t to) {
+//    uint64_t seed = current_time_point().time_since_epoch().count() + nonce;
+//    checksum256 hash = sha256((char *)&seed, sizeof(seed));
+//    uint32_t aux;
+//    memcpy(&aux, &hash, sizeof(aux));
+
+//    uint32_t result = (uint32_t)(aux % to);
+//    return result;
+// }
+
+// static string generateBetName(uint32_t size) {
+//    const char* CHARSET = "abcdefghijklmnopqrstuvwxyz12345";
+//    const uint32_t CHARSET_SIZE = 31;
+//    string bet_name(size, ' ');
+//    for (int i = 0; i < size; i++)
+//        bet_name[i] = CHARSET[prng_range(i, CHARSET_SIZE)];
+//    return bet_name;
+// }
+
 // Initialize bet
 void lovebets::initbet(
    name bet_name,
@@ -13,10 +33,12 @@ void lovebets::initbet(
 
    wannabe_bets_t wbets(get_self(), get_self().value);
 
-   //Check if bet name is not taken already
    check(wbets.find(bet_name.value) == wbets.end(), 
-      "Bet name already taken, please choose another name. \n");
+       "Bet name already taken, please choose another name. \n");
 
+   check(wbets.find(bettors) == wbets.end(), 
+      "Your are already married. \n");
+   
    // The ram payer is the last bettor to enter the bet
    name ram_payer = bettors[bettors.size() - 1];
 
