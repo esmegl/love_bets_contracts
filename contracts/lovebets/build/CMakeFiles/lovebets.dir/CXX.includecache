@@ -15,6 +15,16 @@ vector
 -
 string
 -
+stdio.h
+-
+stdlib.h
+-
+eosio/time.hpp
+-
+eosio/crypto.hpp
+-
+eosio/system.hpp
+-
 eosio/eosio.hpp
 -
 eosio/asset.hpp
